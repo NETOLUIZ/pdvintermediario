@@ -1,0 +1,278 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Nunito', 'Inter', 'Segoe UI', Arial, sans-serif;
+
+  --color-orange-300: #ffd74a;
+  --color-orange-400: #f5c800;
+  --color-orange-500: #f5c800;
+  --color-orange-600: #c9a200;
+  --color-orange-700: #a58600;
+
+  --color-yellow-400: #f5c800;
+  --color-yellow-500: #f5c800;
+  --color-yellow-600: #c9a200;
+
+  --color-purple-400: #a965d6;
+  --color-purple-500: #8b3fbe;
+  --color-purple-600: #6f2f98;
+
+  --color-blue-400: #6f8cff;
+  --color-blue-500: #3b5ce6;
+  --color-blue-600: #2d47b5;
+
+  --color-red-400: #ff6b85;
+  --color-red-500: #e91e8c;
+  --color-red-600: #bc166f;
+
+  --color-pink-400: #ff5aad;
+  --color-pink-500: #e91e8c;
+  --color-pink-600: #bd1b71;
+
+  --color-green-400: #73e2a7;
+  --color-green-500: #23b26d;
+  --color-green-600: #148653;
+
+  --color-emerald-400: #73e2a7;
+  --color-emerald-500: #23b26d;
+  --color-emerald-600: #148653;
+
+  --color-cyan-400: #5fd9ff;
+  --color-cyan-500: #3b5ce6;
+  --color-cyan-600: #2d47b5;
+
+  --color-teal-400: #5fd9ff;
+  --color-teal-500: #3b5ce6;
+
+  --color-zinc-300: #c6c2dc;
+  --color-zinc-400: #8884a8;
+  --color-zinc-500: #676384;
+  --color-zinc-600: #4a4661;
+  --color-zinc-700: #262637;
+  --color-zinc-800: #1e1e2b;
+  --color-zinc-900: #16161f;
+
+  --color-gray-300: #c6c2dc;
+  --color-gray-400: #8884a8;
+  --color-gray-500: #676384;
+  --color-gray-600: #4a4661;
+  --color-gray-700: #2b2840;
+  --color-gray-800: #1e1e2b;
+  --color-gray-900: #16161f;
+  --color-gray-950: #0d0d12;
+}
+
+:root {
+  color-scheme: dark;
+  --app-bg: #0d0d12;
+  --surface-1: rgba(22, 22, 31, 0.94);
+  --surface-2: rgba(30, 30, 43, 0.94);
+  --surface-3: rgba(15, 15, 22, 0.92);
+  --text-main: #f0eff8;
+  --text-muted: #8884a8;
+  --border-soft: rgba(139, 63, 190, 0.2);
+  --border-strong: rgba(139, 63, 190, 0.36);
+  --glow-gold: 0 0 0 1px rgba(245, 200, 0, 0.06), 0 18px 50px rgba(245, 200, 0, 0.08);
+  --glow-purple: 0 0 0 1px rgba(139, 63, 190, 0.14), 0 24px 60px rgba(83, 33, 121, 0.28);
+  --panel-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top left, rgba(245, 200, 0, 0.12), transparent 22%),
+    radial-gradient(circle at 82% 14%, rgba(139, 63, 190, 0.14), transparent 20%),
+    radial-gradient(circle at 68% 78%, rgba(59, 92, 230, 0.12), transparent 24%),
+    linear-gradient(180deg, #08080c 0%, #0d0d12 46%, #11111a 100%);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button,
+input,
+select,
+textarea {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(245, 200, 0, 0.85);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(245, 200, 0, 0.22);
+  color: #fffbe0;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(22, 22, 31, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139, 63, 190, 0.82), rgba(245, 200, 0, 0.68));
+  border-radius: 999px;
+  border: 2px solid rgba(22, 22, 31, 0.95);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(139, 63, 190, 1), rgba(245, 200, 0, 0.9));
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 200, 0, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(245, 200, 0, 0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.32s ease forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.2s infinite;
+}
+
+.card-hover {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245, 200, 0, 0.22);
+  box-shadow: var(--glow-purple), var(--glow-gold), var(--panel-shadow);
+}
+
+.badge-novo {
+  background: rgba(59, 92, 230, 0.18);
+  color: #8ea4ff;
+  border: 1px solid rgba(59, 92, 230, 0.28);
+}
+
+.badge-aguardando_pagamento {
+  background: rgba(245, 200, 0, 0.16);
+  color: #f8d84b;
+  border: 1px solid rgba(245, 200, 0, 0.28);
+}
+
+.badge-pagamento_aprovado {
+  background: rgba(35, 178, 109, 0.16);
+  color: #86efb5;
+  border: 1px solid rgba(35, 178, 109, 0.24);
+}
+
+.badge-em_preparo {
+  background: rgba(139, 63, 190, 0.16);
+  color: #ca90f1;
+  border: 1px solid rgba(139, 63, 190, 0.26);
+}
+
+.badge-pronto {
+  background: rgba(35, 178, 109, 0.16);
+  color: #86efb5;
+  border: 1px solid rgba(35, 178, 109, 0.24);
+}
+
+.badge-saiu_entrega {
+  background: rgba(59, 92, 230, 0.16);
+  color: #8ea4ff;
+  border: 1px solid rgba(59, 92, 230, 0.24);
+}
+
+.badge-entregue,
+.badge-finalizado {
+  background: rgba(136, 132, 168, 0.15);
+  color: #d2cfe6;
+  border: 1px solid rgba(136, 132, 168, 0.18);
+}
+
+.badge-cancelado {
+  background: rgba(233, 30, 140, 0.15);
+  color: #ff75b6;
+  border: 1px solid rgba(233, 30, 140, 0.22);
+}
+
+.app-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(245, 200, 0, 0.08), transparent 24%),
+    radial-gradient(circle at 100% 0%, rgba(139, 63, 190, 0.1), transparent 20%),
+    radial-gradient(circle at 72% 100%, rgba(59, 92, 230, 0.09), transparent 24%);
+  z-index: 0;
+}

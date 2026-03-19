@@ -1,0 +1,241 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ─────────────────────────────────────────────
+//  USUARIOS
+// ─────────────────────────────────────────────
+model Usuario {
+  id               String        @id @default(cuid())
+  nome             String
+  email            String        @unique
+  senha_hash       String
+  perfil           String @default("ATENDENTE")
+  ativo            Boolean       @default(true)
+  criado_em        DateTime      @default(now())
+  atualizado_em    DateTime      @updatedAt
+
+  pedidos          Pedido[]      @relation("PedidoOperador")
+  pagamentos_confirmados Pagamento[] @relation("PagamentoConfirmador")
+  historicos       HistoricoPedido[]
+  caixas_abertos   Caixa[]       @relation("CaixaAbertura")
+  caixas_fechados  Caixa[]       @relation("CaixaFechamento")
+}
+
+// ─────────────────────────────────────────────
+//  CLIENTES
+// ─────────────────────────────────────────────
+model Cliente {
+  id            String   @id @default(cuid())
+  nome          String
+  telefone      String?
+  endereco      String?
+  numero        String?
+  bairro        String?
+  complemento   String?
+  referencia    String?
+  criado_em     DateTime @default(now())
+
+  pedidos       Pedido[]
+}
+
+// ─────────────────────────────────────────────
+//  CATEGORIAS E PRODUTOS
+// ─────────────────────────────────────────────
+model Categoria {
+  id        String      @id @default(cuid())
+  nome      String
+  tipo      String
+  ativo     Boolean     @default(true)
+  ordem     Int         @default(0)
+
+  produtos  Produto[]
+}
+
+model Produto {
+  id           String     @id @default(cuid())
+  nome         String
+  descricao    String?
+  imagem_url   String?
+  ativo        Boolean    @default(true)
+  tipo         String
+  categoria_id String
+  categoria    Categoria  @relation(fields: [categoria_id], references: [id])
+  criado_em    DateTime   @default(now())
+  atualizado_em DateTime  @updatedAt
+
+  tamanhos     TamanhoProduto[]
+  sabores      Sabor[]
+  itens_pedido ItemPedido[]
+}
+
+model TamanhoProduto {
+  id         String  @id @default(cuid())
+  produto_id String
+  produto    Produto @relation(fields: [produto_id], references: [id], onDelete: Cascade)
+  tamanho    String  // P, M, G, GG, Broto, Família
+  preco      Float 
+  ativo      Boolean @default(true)
+}
+
+model Sabor {
+  id         String  @id @default(cuid())
+  produto_id String
+  produto    Produto @relation(fields: [produto_id], references: [id], onDelete: Cascade)
+  nome       String
+  descricao  String?
+  ativo      Boolean @default(true)
+}
+
+// ─────────────────────────────────────────────
+//  MESAS
+// ─────────────────────────────────────────────
+model Mesa {
+  id        String     @id @default(cuid())
+  numero    Int        @unique
+  nome      String?
+  status    String @default("LIVRE")
+  capacidade Int?      @default(4)
+
+  pedidos   Pedido[]
+}
+
+// ─────────────────────────────────────────────
+//  PEDIDOS
+// ─────────────────────────────────────────────
+model Pedido {
+  id               String          @id @default(cuid())
+  numero           Int             @unique
+  tipo_atendimento String
+  status_pedido    String    @default("NOVO")
+  status_pagamento String @default("PENDENTE")
+  forma_pagamento  String
+  subtotal         Float          @default(0)
+  taxa_entrega     Float          @default(0)
+  desconto         Float          @default(0)
+  valor_total      Float          @default(0)
+  observacao       String?
+
+  cliente_id       String?
+  cliente          Cliente?        @relation(fields: [cliente_id], references: [id])
+
+  mesa_id          String?
+  mesa             Mesa?           @relation(fields: [mesa_id], references: [id])
+
+  operador_id      String
+  operador         Usuario         @relation("PedidoOperador", fields: [operador_id], references: [id])
+
+  criado_em        DateTime        @default(now())
+  atualizado_em    DateTime        @updatedAt
+
+  itens            ItemPedido[]
+  pagamento        Pagamento?
+  historico        HistoricoPedido[]
+}
+
+model ItemPedido {
+  id          String   @id @default(cuid())
+  pedido_id   String
+  pedido      Pedido   @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
+  produto_id  String
+  produto     Produto  @relation(fields: [produto_id], references: [id])
+  quantidade  Int      @default(1)
+  tamanho     String?
+  sabores     String // Array com nomes dos sabores
+  borda       String?
+  preco_unit  Float  
+  preco_total Float  
+  observacao  String?
+  adicionais  String // Nomes dos adicionais
+}
+
+// ─────────────────────────────────────────────
+//  PAGAMENTOS
+// ─────────────────────────────────────────────
+model Pagamento {
+  id                String         @id @default(cuid())
+  pedido_id         String         @unique
+  pedido            Pedido         @relation(fields: [pedido_id], references: [id])
+  forma             String
+  valor             Float        
+  valor_recebido    Float?        // Para dinheiro
+  troco             Float?       
+  status            String @default("PENDENTE")
+  confirmado        Boolean        @default(false)
+  confirmado_por_id String?
+  confirmado_por    Usuario?       @relation("PagamentoConfirmador", fields: [confirmado_por_id], references: [id])
+  confirmado_em     DateTime?
+  criado_em         DateTime       @default(now())
+  atualizado_em     DateTime       @updatedAt
+}
+
+// ─────────────────────────────────────────────
+//  CAIXA
+// ─────────────────────────────────────────────
+model Caixa {
+  id              String      @id @default(cuid())
+  data_abertura   DateTime    @default(now())
+  data_fechamento DateTime?
+  valor_inicial   Float      @default(0)
+  valor_fechamento Float?   
+  status          String @default("ABERTO")
+  observacao_fechamento String?
+
+  aberto_por_id   String
+  aberto_por      Usuario     @relation("CaixaAbertura", fields: [aberto_por_id], references: [id])
+  fechado_por_id  String?
+  fechado_por     Usuario?    @relation("CaixaFechamento", fields: [fechado_por_id], references: [id])
+
+  movimentacoes   MovimentacaoCaixa[]
+}
+
+model MovimentacaoCaixa {
+  id          String           @id @default(cuid())
+  caixa_id    String
+  caixa       Caixa            @relation(fields: [caixa_id], references: [id])
+  tipo        String
+  descricao   String
+  valor       Float          
+  criado_em   DateTime         @default(now())
+}
+
+// ─────────────────────────────────────────────
+//  HISTÓRICO DO PEDIDO
+// ─────────────────────────────────────────────
+model HistoricoPedido {
+  id              String       @id @default(cuid())
+  pedido_id       String
+  pedido          Pedido       @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
+  status_anterior String?
+  status_novo     String
+  usuario_id      String?
+  usuario         Usuario?     @relation(fields: [usuario_id], references: [id])
+  observacao      String?
+  criado_em       DateTime     @default(now())
+}

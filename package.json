@@ -1,0 +1,13 @@
+{
+  "name": "pdv-pizzaria",
+  "version": "1.0.0",
+  "description": "Sistema PDV Pizzaria",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev": "npm run start:all",
+    "start:all": "npx concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
