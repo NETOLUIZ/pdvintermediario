@@ -1,0 +1,294 @@
+.mesas-page {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(245, 200, 0, 0.1), transparent 24%),
+    radial-gradient(circle at 88% 0%, rgba(139, 63, 190, 0.12), transparent 22%),
+    linear-gradient(180deg, #0a0a0f 0%, #101018 100%);
+}
+
+.mesas-page__container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px 36px;
+}
+
+.mesas-page__hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.mesas-page__eyebrow {
+  margin: 0 0 8px;
+  color: rgba(240, 239, 248, 0.64);
+  font-size: 0.98rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.mesas-page__title {
+  margin: 0;
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.mesas-page__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  color: rgba(240, 239, 248, 0.72);
+  font-size: 0.96rem;
+  font-weight: 700;
+  border: 1px solid rgba(145, 118, 191, 0.2);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(35, 35, 45, 0.94), rgba(28, 28, 38, 0.96));
+}
+
+.mesas-page__refresh:hover {
+  color: #fff;
+  border-color: rgba(245, 200, 0, 0.22);
+}
+
+.mesas-page__refresh-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.mesas-page__summary {
+  margin-bottom: 26px;
+}
+
+.mesas-page__summary-badges {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.mesas-page__summary-item {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.mesas-page__summary-item--livre {
+  color: #62df88;
+}
+
+.mesas-page__summary-item--ocupada {
+  color: #f5c800;
+}
+
+.mesas-page__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.mesas-page__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mesas-page__legend-dot {
+  width: 18px;
+  height: 18px;
+  border: 1px solid;
+  border-radius: 6px;
+}
+
+.mesas-page__legend-dot--livre {
+  border-color: rgba(98, 223, 136, 0.56);
+  background: rgba(98, 223, 136, 0.12);
+}
+
+.mesas-page__legend-dot--ocupada {
+  border-color: rgba(245, 200, 0, 0.52);
+  background: rgba(245, 200, 0, 0.14);
+}
+
+.mesas-page__legend-dot--reservada {
+  border-color: rgba(87, 128, 255, 0.48);
+  background: rgba(87, 128, 255, 0.12);
+}
+
+.mesas-page__legend-text {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.mesas-page__legend-text--livre {
+  color: #62df88;
+}
+
+.mesas-page__legend-text--ocupada {
+  color: #f5c800;
+}
+
+.mesas-page__legend-text--reservada {
+  color: #7d9cff;
+}
+
+.mesas-page__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52vh;
+}
+
+.mesas-page__spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(245, 200, 0, 0.24);
+  border-top-color: #f5c800;
+  border-radius: 999px;
+  animation: spin 0.9s linear infinite;
+}
+
+.mesas-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.mesas-page__table-card {
+  padding: 24px 16px 18px;
+  text-align: center;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.03), transparent 24%),
+    linear-gradient(180deg, rgba(30, 30, 40, 0.96), rgba(24, 24, 34, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(145, 118, 191, 0.18),
+    0 18px 38px rgba(0, 0, 0, 0.3);
+}
+
+.mesas-page__table-number {
+  margin-bottom: 22px;
+  color: #f5c800;
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.mesas-page__table-pill {
+  width: 114px;
+  height: 42px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+}
+
+.mesas-page__table-pill--livre {
+  background: linear-gradient(90deg, #3bc965 0%, #4bd16e 100%);
+  box-shadow: 0 14px 26px rgba(66, 211, 110, 0.22);
+}
+
+.mesas-page__table-pill--ocupada {
+  background: linear-gradient(90deg, #f5c800 0%, #ffaf1f 100%);
+  box-shadow: 0 14px 26px rgba(245, 200, 0, 0.18);
+}
+
+.mesas-page__table-pill--reservada {
+  background: linear-gradient(90deg, #4e7dff 0%, #6d94ff 100%);
+  box-shadow: 0 14px 26px rgba(78, 125, 255, 0.18);
+}
+
+.mesas-page__table-status {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: rgba(240, 239, 248, 0.88);
+}
+
+.mesas-page__table-card--livre .mesas-page__table-status {
+  color: #6cdd8f;
+}
+
+.mesas-page__table-card--ocupada .mesas-page__table-status {
+  color: #ffd74a;
+}
+
+.mesas-page__table-card--reservada .mesas-page__table-status {
+  color: #89a7ff;
+}
+
+.mesas-page__table-order {
+  margin-top: 12px;
+}
+
+.mesas-page__table-total {
+  margin: 0 0 4px;
+  color: #f5c800;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.mesas-page__table-order-number {
+  margin: 0;
+  color: rgba(240, 239, 248, 0.42);
+  font-size: 0.78rem;
+}
+
+.mesas-page__release {
+  margin-top: 12px;
+  color: #ff83ba;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+}
+
+.mesas-page__release:hover {
+  color: #ffacd2;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .mesas-page__container {
+    padding: 24px 18px 32px;
+  }
+
+  .mesas-page__hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mesas-page__title {
+    font-size: 2.4rem;
+  }
+
+  .mesas-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .mesas-page__title {
+    font-size: 2rem;
+  }
+
+  .mesas-page__summary-badges,
+  .mesas-page__legend {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .mesas-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

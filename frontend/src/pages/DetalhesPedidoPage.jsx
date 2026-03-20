@@ -6,8 +6,10 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeft, CheckCircle, AlertCircle, Clock, Truck,
   Package, XCircle, User, Table2, CreditCard, Banknote, QrCode,
-  ShieldCheck, ChevronRight, History
+  ShieldCheck, ChevronRight, History, Printer, Receipt
 } from 'lucide-react';
+import './DetalhesPedidoPage.css';
+import { imprimirPedidoCliente, imprimirPedidoCozinha } from '../utils/printPedido';
 
 const STATUS_COLORS = {
   NOVO: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -104,7 +106,7 @@ export default function DetalhesPedidoPage() {
   const isCartao = ['CARTAO_DEBITO', 'CARTAO_CREDITO'].includes(pedido.forma_pagamento);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto animate-fade-in">
+    <div className="detalhes-pedido-page p-6 max-w-4xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Link to="/pedidos" className="p-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
@@ -322,6 +324,18 @@ export default function DetalhesPedidoPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
             <h2 className="text-white font-semibold mb-4">Ações</h2>
             <div className="space-y-2">
+              <button
+                onClick={() => imprimirPedidoCliente(pedido)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 text-orange-300 rounded-xl text-sm font-medium transition-all"
+              >
+                <span className="flex items-center gap-2"><Receipt className="w-4 h-4" /> Imprimir via do cliente</span>
+              </button>
+              <button
+                onClick={() => imprimirPedidoCozinha(pedido)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-300 rounded-xl text-sm font-medium transition-all"
+              >
+                <span className="flex items-center gap-2"><Printer className="w-4 h-4" /> Imprimir via da cozinha</span>
+              </button>
               {pagamentoAprovado && pedido.status_pedido === 'PAGAMENTO_APROVADO' && (
                 <button onClick={() => mudarStatus('EM_PREPARO')} disabled={loadingAcao}
                   className="w-full flex items-center justify-between px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-purple-400 rounded-xl text-sm font-medium transition-all">

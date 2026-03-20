@@ -9,6 +9,8 @@ import {
   X, Truck, User, Table2, Banknote, QrCode, CreditCard,
   AlertCircle, CheckCircle, Pizza
 } from 'lucide-react';
+import './PDVPage.css';
+import { imprimirPedidoCliente, imprimirPedidoCozinha } from '../utils/printPedido';
 
 // ── Componente Modal genérico ──────────────────────────────────
 function Modal({ open, onClose, title, children, maxW = 'max-w-md' }) {
@@ -193,6 +195,28 @@ export default function PDVPage() {
       };
 
       const res = await api.post('/pedidos', pedidoData);
+      const pedidoCriado = {
+        ...res.data,
+        forma_pagamento: formaPag,
+        tipo_atendimento: tipoAtendimento,
+        observacao: observacaoPedido,
+        subtotal,
+        taxa_entrega: tipoAtendimento === 'DELIVERY' ? parseFloat(taxaEntrega || 0) : 0,
+        desconto: parseFloat(desconto || 0),
+        valor_total: total,
+        itens: itens.map(i => ({
+          ...i,
+          preco_total: i.preco_unit * i.quantidade,
+        })),
+        cliente: clienteSelecionado,
+        mesa: mesaSelecionada,
+        pagamento: {
+          forma: formaPag,
+          valor: total,
+          valor_recebido: formaPag === 'DINHEIRO' && valorRecebido ? parseFloat(valorRecebido) : null,
+          troco: formaPag === 'DINHEIRO' && valorRecebido ? parseFloat(valorRecebido) - total : null,
+        },
+      };
       setModalPagamento(false);
       limparCarrinho();
 
@@ -200,6 +224,17 @@ export default function PDVPage() {
         toast('⏳ Pedido criado! Aguardando confirmação de pagamento.', { duration: 5000, icon: '🔔' });
       } else {
         toast.success('✅ Pedido criado com sucesso!');
+      }
+
+      try {
+        if (window.confirm('Deseja imprimir a via do cliente agora?')) {
+          imprimirPedidoCliente(pedidoCriado);
+        }
+        if (window.confirm('Deseja imprimir a via de producao/cozinha agora?')) {
+          imprimirPedidoCozinha(pedidoCriado);
+        }
+      } catch {
+        toast.error('Nao foi possivel abrir a janela de impressao');
       }
 
       navigate(`/pedidos/${res.data.id}`);
@@ -214,9 +249,9 @@ export default function PDVPage() {
   const tipoAtual = TIPOS.find(t => t.value === tipoAtendimento);
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="pdv-page flex h-full overflow-hidden">
       {/* ── ESQUERDA: Produtos ────────────────────────────────── */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(245,200,0,0.08),transparent_18%),radial-gradient(circle_at_top_right,rgba(139,63,190,0.12),transparent_20%),linear-gradient(180deg,#0b0b10_0%,#11111a_100%)]">
+      <div className="pdv-page__catalog flex-1 flex flex-col overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(245,200,0,0.08),transparent_18%),radial-gradient(circle_at_top_right,rgba(139,63,190,0.12),transparent_20%),linear-gradient(180deg,#0b0b10_0%,#11111a_100%)]">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-purple-500/12 px-6 py-4">
           <div>

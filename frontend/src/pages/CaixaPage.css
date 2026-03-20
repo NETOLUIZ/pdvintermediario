@@ -1,0 +1,479 @@
+.caixa-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 100%;
+  padding: 1.75rem;
+  color: var(--color-text-primary);
+}
+
+.caixa-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top left, rgba(245, 200, 0, 0.1), transparent 30%),
+    radial-gradient(circle at top right, rgba(139, 63, 190, 0.14), transparent 32%),
+    radial-gradient(circle at bottom center, rgba(59, 92, 230, 0.08), transparent 26%);
+}
+
+.caixa-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.caixa-page--loading,
+.caixa-page--closed {
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
+.caixa-page__spinner {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 4px solid rgba(245, 200, 0, 0.18);
+  border-top-color: #f5c800;
+  border-radius: 999px;
+  animation: spin 1s linear infinite;
+}
+
+.caixa-page__closed-card {
+  width: min(100%, 31rem);
+  padding: 2rem;
+  border: 1px solid rgba(139, 63, 190, 0.24);
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at top center, rgba(245, 200, 0, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(28, 28, 39, 0.98), rgba(18, 18, 27, 0.98));
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.32),
+    0 0 36px rgba(245, 200, 0, 0.08);
+  text-align: center;
+}
+
+.caixa-page__closed-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.75rem;
+  height: 4.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(245, 200, 0, 0.2);
+  border-radius: 1.4rem;
+  background: linear-gradient(180deg, rgba(245, 200, 0, 0.16), rgba(139, 63, 190, 0.08));
+  color: #f5c800;
+  box-shadow: 0 0 32px rgba(245, 200, 0, 0.12);
+}
+
+.caixa-page__eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.caixa-page__closed-title,
+.caixa-page__title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.96;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.caixa-page__closed-text,
+.caixa-page__subtitle {
+  margin: 0.9rem 0 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(240, 239, 248, 0.76);
+}
+
+.caixa-page__open-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 1.5rem 0 1rem;
+  text-align: left;
+}
+
+.caixa-page__open-form label,
+.caixa-page__status-label,
+.caixa-page__stat-label,
+.caixa-page__panel-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(240, 239, 248, 0.64);
+}
+
+.caixa-page__open-form input,
+.caixa-page__input {
+  width: 100%;
+  min-height: 3.15rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(139, 63, 190, 0.22);
+  border-radius: 1rem;
+  background: rgba(13, 13, 18, 0.78);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.caixa-page__open-form input {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.caixa-page__open-form input:focus,
+.caixa-page__input:focus {
+  border-color: rgba(245, 200, 0, 0.42);
+  box-shadow: 0 0 0 4px rgba(245, 200, 0, 0.08);
+}
+
+.caixa-page__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.caixa-page__danger-button,
+.caixa-page__primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3.5rem;
+  padding: 0 1.4rem;
+  border-radius: 1.2rem;
+  font-size: 0.96rem;
+  font-weight: 900;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.caixa-page__primary-button {
+  width: 100%;
+  border: 1px solid rgba(245, 200, 0, 0.32);
+  background: linear-gradient(135deg, #f5c800 0%, #ffd84d 100%);
+  color: #1c1603;
+  box-shadow: 0 18px 48px rgba(245, 200, 0, 0.22);
+}
+
+.caixa-page__primary-button.is-inline {
+  width: auto;
+  min-width: 9rem;
+}
+
+.caixa-page__danger-button {
+  border: 1px solid rgba(248, 113, 113, 0.26);
+  background: rgba(127, 29, 29, 0.16);
+  color: #fca5a5;
+  box-shadow: 0 18px 48px rgba(127, 29, 29, 0.16);
+}
+
+.caixa-page__danger-button:hover,
+.caixa-page__primary-button:hover {
+  transform: translateY(-2px);
+}
+
+.caixa-page__status-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.caixa-page__status-card,
+.caixa-page__stat-card,
+.caixa-page__panel {
+  border: 1px solid rgba(139, 63, 190, 0.24);
+  background:
+    linear-gradient(180deg, rgba(32, 32, 44, 0.96), rgba(22, 22, 31, 0.98)),
+    rgba(22, 22, 31, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 44px rgba(0, 0, 0, 0.28);
+}
+
+.caixa-page__status-card {
+  padding: 1.2rem 1.35rem;
+  border-radius: 1.4rem;
+}
+
+.caixa-page__status-card strong {
+  display: block;
+  margin-top: 0.32rem;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.caixa-page__status-card.is-highlight {
+  border-color: rgba(245, 200, 0, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 44px rgba(0, 0, 0, 0.28),
+    0 0 30px rgba(245, 200, 0, 0.08);
+}
+
+.caixa-page__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.caixa-page__stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem;
+  border-radius: 1.4rem;
+}
+
+.caixa-page__stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.15rem;
+  height: 3.15rem;
+  border-radius: 1rem;
+}
+
+.caixa-page__stat-card.tone-success .caixa-page__stat-icon {
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  background: rgba(34, 197, 94, 0.12);
+  color: #7bf1ab;
+}
+
+.caixa-page__stat-card.tone-info .caixa-page__stat-icon {
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  background: rgba(59, 92, 230, 0.12);
+  color: #87a7ff;
+}
+
+.caixa-page__stat-card.tone-neutral .caixa-page__stat-icon {
+  border: 1px solid rgba(245, 200, 0, 0.18);
+  background: rgba(245, 200, 0, 0.12);
+  color: #f5c800;
+}
+
+.caixa-page__stat-card.tone-danger .caixa-page__stat-icon {
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.caixa-page__stat-value {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.caixa-page__content {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 1.25rem;
+}
+
+.caixa-page__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.35rem;
+  border-radius: 1.6rem;
+}
+
+.caixa-page__panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.caixa-page__panel-title {
+  margin: 0.28rem 0 0;
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.caixa-page__panel-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgba(245, 200, 0, 0.18);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(245, 200, 0, 0.14), rgba(139, 63, 190, 0.08));
+  color: #f5c800;
+}
+
+.caixa-page__payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.72rem;
+}
+
+.caixa-page__payment-row,
+.caixa-page__movement-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(139, 63, 190, 0.16);
+  border-radius: 1rem;
+  background: rgba(12, 12, 18, 0.52);
+}
+
+.caixa-page__payment-row span {
+  color: rgba(240, 239, 248, 0.72);
+}
+
+.caixa-page__payment-row strong {
+  color: #fff4bf;
+}
+
+.caixa-page__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(245, 200, 0, 0.22);
+  border-radius: 1.1rem;
+  background: rgba(245, 200, 0, 0.08);
+}
+
+.caixa-page__balance span {
+  font-weight: 800;
+  color: rgba(240, 239, 248, 0.84);
+}
+
+.caixa-page__balance strong {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #f5c800;
+}
+
+.caixa-page__movement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.caixa-page__movement-types {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.caixa-page__movement-type {
+  min-height: 3rem;
+  border: 1px solid rgba(139, 63, 190, 0.18);
+  border-radius: 1rem;
+  background: rgba(18, 18, 27, 0.72);
+  color: rgba(240, 239, 248, 0.64);
+  font-weight: 800;
+}
+
+.caixa-page__movement-type.is-active.is-success {
+  border-color: rgba(74, 222, 128, 0.26);
+  background: rgba(34, 197, 94, 0.12);
+  color: #7bf1ab;
+}
+
+.caixa-page__movement-type.is-active.is-danger {
+  border-color: rgba(248, 113, 113, 0.26);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.caixa-page__movement-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem;
+}
+
+.caixa-page__movement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  max-height: 23rem;
+  overflow-y: auto;
+}
+
+.caixa-page__movement-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 14rem;
+  border: 1px dashed rgba(139, 63, 190, 0.2);
+  border-radius: 1.2rem;
+  color: rgba(240, 239, 248, 0.46);
+}
+
+.caixa-page__movement-description {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.caixa-page__movement-time {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(240, 239, 248, 0.5);
+}
+
+.caixa-page__movement-value {
+  font-weight: 900;
+}
+
+.caixa-page__movement-value.is-positive {
+  color: #7bf1ab;
+}
+
+.caixa-page__movement-value.is-negative {
+  color: #fca5a5;
+}
+
+@media (max-width: 1100px) {
+  .caixa-page__hero {
+    flex-direction: column;
+  }
+
+  .caixa-page__danger-button {
+    width: 100%;
+  }
+
+  .caixa-page__status-row,
+  .caixa-page__stats,
+  .caixa-page__content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .caixa-page {
+    padding: 1rem;
+  }
+
+  .caixa-page__movement-row {
+    grid-template-columns: 1fr;
+  }
+
+  .caixa-page__primary-button.is-inline {
+    width: 100%;
+  }
+}

@@ -2,22 +2,45 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, X, Package, ToggleLeft, ToggleRight } from 'lucide-react';
+import {
+  Plus,
+  X,
+  Package,
+  ToggleLeft,
+  ToggleRight,
+  Layers3,
+  Search,
+  Sparkles,
+} from 'lucide-react';
+import './ProdutosPage.css';
 
 const TIPOS = ['PIZZA', 'BEBIDA', 'SOBREMESA', 'COMBO', 'ADICIONAL', 'BORDA'];
-const TIPO_EMOJI = { PIZZA: '🍕', BEBIDA: '🥤', SOBREMESA: '🍰', COMBO: '📦', ADICIONAL: '➕', BORDA: '🔄' };
+const TIPO_EMOJI = {
+  PIZZA: '🍕',
+  BEBIDA: '🥤',
+  SOBREMESA: '🍰',
+  COMBO: '📦',
+  ADICIONAL: '➕',
+  BORDA: '🔄',
+};
 
 function Modal({ open, onClose, children, title }) {
   if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-          <h3 className="text-white font-semibold">{title}</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+    <div className="produtos-modal" role="dialog" aria-modal="true">
+      <div className="produtos-modal__backdrop" onClick={onClose} />
+      <div className="produtos-modal__panel">
+        <div className="produtos-modal__header">
+          <div>
+            <p className="produtos-modal__eyebrow">Cadastro</p>
+            <h3 className="produtos-modal__title">{title}</h3>
+          </div>
+          <button onClick={onClose} className="produtos-modal__close" type="button" aria-label="Fechar modal">
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="produtos-modal__body">{children}</div>
       </div>
     </div>
   );
@@ -30,7 +53,13 @@ export default function ProdutosPage() {
   const [catFiltro, setCatFiltro] = useState('');
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
-  const [form, setForm] = useState({ nome: '', descricao: '', tipo: 'PIZZA', categoria_id: '', tamanhos: [{ tamanho: 'M', preco: '' }] });
+  const [form, setForm] = useState({
+    nome: '',
+    descricao: '',
+    tipo: 'PIZZA',
+    categoria_id: '',
+    tamanhos: [{ tamanho: 'M', preco: '' }],
+  });
 
   const fetchData = async () => {
     const [p, c] = await Promise.all([
@@ -42,12 +71,20 @@ export default function ProdutosPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, [catFiltro]);
+  useEffect(() => {
+    fetchData();
+  }, [catFiltro]);
 
   const handleSalvar = async () => {
-    if (!form.nome || !form.tipo || !form.categoria_id) return toast.error('Preencha todos os campos obrigatórios');
+    if (!form.nome || !form.tipo || !form.categoria_id) {
+      return toast.error('Preencha todos os campos obrigatórios');
+    }
+
     try {
-      await api.post('/produtos', { ...form, tamanhos: form.tamanhos.filter(t => t.preco) });
+      await api.post('/produtos', {
+        ...form,
+        tamanhos: form.tamanhos.filter((t) => t.preco),
+      });
       toast.success('Produto criado!');
       setModal(false);
       fetchData();
@@ -61,130 +98,284 @@ export default function ProdutosPage() {
       await api.put(`/produtos/${id}`, { ativo: !ativo });
       toast.success(ativo ? 'Produto desativado' : 'Produto ativado');
       fetchData();
-    } catch { toast.error('Erro ao atualizar produto'); }
+    } catch {
+      toast.error('Erro ao atualizar produto');
+    }
   };
 
   const tamSizes = ['Broto', 'P', 'M', 'G', 'GG', 'Família', 'Único'];
+  const ativos = produtos.filter((produto) => produto.ativo).length;
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="produtos-page animate-fade-in">
+      <section className="produtos-page__hero">
         <div>
-          <h1 className="text-2xl font-bold text-white">Produtos</h1>
-          <p className="text-gray-400 text-sm">{produtos.length} produto(s)</p>
+          <p className="produtos-page__eyebrow">Catálogo operacional</p>
+          <h1 className="produtos-page__title">Produtos e categorias do cardápio</h1>
+          <p className="produtos-page__subtitle">
+            Gerencie itens vendidos no balcão, mesa e delivery com a mesma linguagem visual do restante do sistema.
+          </p>
         </div>
+
         {isAdmin() && (
-          <button onClick={() => { setForm({ nome: '', descricao: '', tipo: 'PIZZA', categoria_id: '', tamanhos: [{ tamanho: 'M', preco: '' }] }); setModal(true); }}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all">
-            <Plus className="w-4 h-4" /> Novo Produto
+          <button
+            type="button"
+            onClick={() => {
+              setForm({
+                nome: '',
+                descricao: '',
+                tipo: 'PIZZA',
+                categoria_id: '',
+                tamanhos: [{ tamanho: 'M', preco: '' }],
+              });
+              setModal(true);
+            }}
+            className="produtos-page__primary-button"
+          >
+            <Plus className="w-4 h-4" />
+            Novo Produto
           </button>
         )}
-      </div>
+      </section>
 
-      {/* Filtro categorias */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        <button onClick={() => setCatFiltro('')}
-          className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${!catFiltro ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}>
-          Todos
-        </button>
-        {categorias.map(c => (
-          <button key={c.id} onClick={() => setCatFiltro(c.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${catFiltro === c.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}>
-            {TIPO_EMOJI[c.tipo]} {c.nome}
+      <section className="produtos-page__stats">
+        <article className="produtos-page__stat-card">
+          <div className="produtos-page__stat-icon">
+            <Package className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="produtos-page__stat-label">Total de produtos</p>
+            <strong className="produtos-page__stat-value">{produtos.length}</strong>
+          </div>
+        </article>
+
+        <article className="produtos-page__stat-card">
+          <div className="produtos-page__stat-icon">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="produtos-page__stat-label">Produtos ativos</p>
+            <strong className="produtos-page__stat-value">{ativos}</strong>
+          </div>
+        </article>
+
+        <article className="produtos-page__stat-card">
+          <div className="produtos-page__stat-icon">
+            <Layers3 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="produtos-page__stat-label">Categorias</p>
+            <strong className="produtos-page__stat-value">{categorias.length}</strong>
+          </div>
+        </article>
+      </section>
+
+      <section className="produtos-page__filters">
+        <div className="produtos-page__search">
+          <Search className="w-5 h-5" />
+          <span>Filtre por categoria para focar no cardápio ativo</span>
+        </div>
+
+        <div className="produtos-page__chips">
+          <button
+            type="button"
+            onClick={() => setCatFiltro('')}
+            className={`produtos-page__chip ${!catFiltro ? 'is-active' : ''}`}
+          >
+            Todos
           </button>
-        ))}
-      </div>
+          {categorias.map((categoria) => (
+            <button
+              key={categoria.id}
+              type="button"
+              onClick={() => setCatFiltro(categoria.id)}
+              className={`produtos-page__chip ${catFiltro === categoria.id ? 'is-active' : ''}`}
+            >
+              <span>{TIPO_EMOJI[categoria.tipo]}</span>
+              {categoria.nome}
+            </button>
+          ))}
+        </div>
+      </section>
 
-      {/* Grid */}
       {loading ? (
-        <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="produtos-page__loading">
+          <div className="produtos-page__spinner" />
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {produtos.map(p => (
-            <div key={p.id} className={`bg-gray-900 border rounded-2xl p-4 card-hover ${!p.ativo ? 'opacity-50 border-gray-800' : 'border-gray-800'}`}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-xl">
-                  {TIPO_EMOJI[p.tipo]}
-                </div>
+        <section className="produtos-page__grid">
+          {produtos.map((produto) => (
+            <article
+              key={produto.id}
+              className={`produtos-page__card ${!produto.ativo ? 'is-inactive' : ''}`}
+            >
+              <div className="produtos-page__card-top">
+                <div className="produtos-page__card-badge">{TIPO_EMOJI[produto.tipo]}</div>
                 {isAdmin() && (
-                  <button onClick={() => handleToggle(p.id, p.ativo)} className="text-gray-500 hover:text-orange-400 transition-colors">
-                    {p.ativo ? <ToggleRight className="w-5 h-5 text-green-400" /> : <ToggleLeft className="w-5 h-5" />}
+                  <button
+                    type="button"
+                    onClick={() => handleToggle(produto.id, produto.ativo)}
+                    className="produtos-page__toggle"
+                    aria-label={produto.ativo ? 'Desativar produto' : 'Ativar produto'}
+                  >
+                    {produto.ativo ? (
+                      <ToggleRight className="w-6 h-6 text-emerald-400" />
+                    ) : (
+                      <ToggleLeft className="w-6 h-6 text-slate-500" />
+                    )}
                   </button>
                 )}
               </div>
-              <p className="text-white font-semibold text-sm mb-1">{p.nome}</p>
-              {p.descricao && <p className="text-gray-500 text-xs mb-3 line-clamp-2">{p.descricao}</p>}
-              <div className="space-y-1">
-                {p.tamanhos?.slice(0, 3).map(t => (
-                  <div key={t.id} className="flex justify-between text-xs">
-                    <span className="text-gray-500">{t.tamanho}</span>
-                    <span className="text-orange-400 font-medium">R$ {parseFloat(t.preco).toFixed(2)}</span>
-                  </div>
-                ))}
+
+              <div className="produtos-page__card-content">
+                <div>
+                  <h2 className="produtos-page__card-title">{produto.nome}</h2>
+                  {produto.descricao && (
+                    <p className="produtos-page__card-description">{produto.descricao}</p>
+                  )}
+                </div>
+
+                <div className="produtos-page__prices">
+                  {produto.tamanhos?.slice(0, 3).map((tamanho) => (
+                    <div key={tamanho.id} className="produtos-page__price-row">
+                      <span>{tamanho.tamanho}</span>
+                      <strong>R$ {parseFloat(tamanho.preco).toFixed(2)}</strong>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="produtos-page__footer">
+                  <span className="produtos-page__category">{produto.categoria?.nome}</span>
+                  <span className={`produtos-page__status ${produto.ativo ? 'is-active' : 'is-inactive'}`}>
+                    {produto.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
               </div>
-              <div className="mt-2">
-                <span className="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">{p.categoria?.nome}</span>
-              </div>
-            </div>
+            </article>
           ))}
-        </div>
+        </section>
       )}
 
-      {/* Modal novo produto */}
       <Modal open={modal} onClose={() => setModal(false)} title="Novo Produto">
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-gray-400 text-xs block mb-1">Nome *</label>
-              <input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500" />
+        <div className="produtos-form">
+          <div className="produtos-form__grid">
+            <div className="produtos-form__field">
+              <label>Nome *</label>
+              <input
+                value={form.nome}
+                onChange={(e) => setForm((prev) => ({ ...prev, nome: e.target.value }))}
+              />
             </div>
-            <div>
-              <label className="text-gray-400 text-xs block mb-1">Tipo *</label>
-              <select value={form.tipo} onChange={e => setForm(p => ({ ...p, tipo: e.target.value }))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
+
+            <div className="produtos-form__field">
+              <label>Tipo *</label>
+              <select
+                value={form.tipo}
+                onChange={(e) => setForm((prev) => ({ ...prev, tipo: e.target.value }))}
+              >
+                {TIPOS.map((tipo) => (
+                  <option key={tipo} value={tipo}>
+                    {tipo}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
-          <div>
-            <label className="text-gray-400 text-xs block mb-1">Categoria *</label>
-            <select value={form.categoria_id} onChange={e => setForm(p => ({ ...p, categoria_id: e.target.value }))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+
+          <div className="produtos-form__field">
+            <label>Categoria *</label>
+            <select
+              value={form.categoria_id}
+              onChange={(e) => setForm((prev) => ({ ...prev, categoria_id: e.target.value }))}
+            >
               <option value="">Selecione...</option>
-              {categorias.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              {categorias.map((categoria) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.nome}
+                </option>
+              ))}
             </select>
           </div>
-          <div>
-            <label className="text-gray-400 text-xs block mb-1">Descrição</label>
-            <textarea value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} rows={2}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 resize-none" />
+
+          <div className="produtos-form__field">
+            <label>Descrição</label>
+            <textarea
+              value={form.descricao}
+              rows={2}
+              onChange={(e) => setForm((prev) => ({ ...prev, descricao: e.target.value }))}
+            />
           </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-gray-400 text-xs">Tamanhos e preços</label>
-              <button onClick={() => setForm(p => ({ ...p, tamanhos: [...p.tamanhos, { tamanho: 'M', preco: '' }] }))}
-                className="text-orange-400 text-xs hover:text-orange-300 flex items-center gap-1">
-                <Plus className="w-3 h-3" /> adicionar
+
+          <div className="produtos-form__sizes">
+            <div className="produtos-form__sizes-header">
+              <label>Tamanhos e preços</label>
+              <button
+                type="button"
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    tamanhos: [...prev.tamanhos, { tamanho: 'M', preco: '' }],
+                  }))
+                }
+              >
+                <Plus className="w-3 h-3" />
+                adicionar
               </button>
             </div>
-            {form.tamanhos.map((t, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <select value={t.tamanho} onChange={e => setForm(p => ({ ...p, tamanhos: p.tamanhos.map((x, j) => j === i ? { ...x, tamanho: e.target.value } : x) }))}
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
-                  {tamSizes.map(s => <option key={s} value={s}>{s}</option>)}
+
+            {form.tamanhos.map((tamanho, index) => (
+              <div key={`${tamanho.tamanho}-${index}`} className="produtos-form__size-row">
+                <select
+                  value={tamanho.tamanho}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      tamanhos: prev.tamanhos.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, tamanho: e.target.value } : item,
+                      ),
+                    }))
+                  }
+                >
+                  {tamSizes.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
                 </select>
-                <input type="number" placeholder="Preço" value={t.preco}
-                  onChange={e => setForm(p => ({ ...p, tamanhos: p.tamanhos.map((x, j) => j === i ? { ...x, preco: e.target.value } : x) }))}
-                  className="w-28 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none" />
+
+                <input
+                  type="number"
+                  placeholder="Preço"
+                  value={tamanho.preco}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      tamanhos: prev.tamanhos.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, preco: e.target.value } : item,
+                      ),
+                    }))
+                  }
+                />
+
                 {form.tamanhos.length > 1 && (
-                  <button onClick={() => setForm(p => ({ ...p, tamanhos: p.tamanhos.filter((_, j) => j !== i) }))}
-                    className="text-gray-600 hover:text-red-400"><X className="w-4 h-4" /></button>
+                  <button
+                    type="button"
+                    className="produtos-form__remove"
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        tamanhos: prev.tamanhos.filter((_, itemIndex) => itemIndex !== index),
+                      }))
+                    }
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 )}
               </div>
             ))}
           </div>
-          <button onClick={handleSalvar} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition-all">
+
+          <button type="button" onClick={handleSalvar} className="produtos-form__submit">
             Salvar Produto
           </button>
         </div>

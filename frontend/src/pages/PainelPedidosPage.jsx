@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Search, Filter, Eye, Clock, AlertCircle, CheckCircle, Truck, RefreshCw } from 'lucide-react';
+import { Search, Eye, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import './PainelPedidosPage.css';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos os status' },
@@ -38,18 +39,31 @@ const STATUS_COLORS = {
 };
 
 const STATUS_LABELS = {
-  NOVO: 'Novo', AGUARDANDO_PAGAMENTO: 'Aguard. Pagamento',
-  PAGAMENTO_APROVADO: 'Pag. Aprovado', EM_PREPARO: 'Em Preparo',
-  PRONTO: 'Pronto', SAIU_ENTREGA: 'Saiu p/Entrega',
-  ENTREGUE: 'Entregue', FINALIZADO: 'Finalizado', CANCELADO: 'Cancelado',
+  NOVO: 'Novo',
+  AGUARDANDO_PAGAMENTO: 'Aguard. Pagamento',
+  PAGAMENTO_APROVADO: 'Pag. Aprovado',
+  EM_PREPARO: 'Em Preparo',
+  PRONTO: 'Pronto',
+  SAIU_ENTREGA: 'Saiu p/Entrega',
+  ENTREGUE: 'Entregue',
+  FINALIZADO: 'Finalizado',
+  CANCELADO: 'Cancelado',
 };
 
 const TIPO_LABELS = {
-  PRESENCIAL: '🏪', BALCAO: '🍕', CONSUMO_LOCAL: '🪑',
-  RETIRADA: '🏃', DELIVERY: '🛵',
+  PRESENCIAL: '🏪',
+  BALCAO: '🍕',
+  CONSUMO_LOCAL: '🪑',
+  RETIRADA: '🏃',
+  DELIVERY: '🛵',
 };
 
-const FORMA_LABELS = { DINHEIRO: '💵', PIX: '📱', CARTAO_DEBITO: '💳', CARTAO_CREDITO: '💳' };
+const FORMA_LABELS = {
+  DINHEIRO: '💵',
+  PIX: '📱',
+  CARTAO_DEBITO: '💳',
+  CARTAO_CREDITO: '💳',
+};
 
 function diffMinutes(date) {
   return Math.floor((Date.now() - new Date(date).getTime()) / 60000);
@@ -86,116 +100,117 @@ export default function PainelPedidosPage() {
   }, [filtros]);
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Painel de Pedidos</h1>
-          <p className="text-gray-400 text-sm">{total} pedido(s) encontrado(s)</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={fetchPedidos}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" /> Atualizar
-          </button>
-          <Link to="/pdv" className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 rounded-xl text-sm text-white font-medium transition-colors">
-            + Novo Pedido
-          </Link>
-        </div>
-      </div>
+    <div className="painel-pedidos-page animate-fade-in">
+      <div className="painel-pedidos-page__container">
+        <header className="painel-pedidos-page__hero">
+          <div className="painel-pedidos-page__hero-copy">
+            <p className="painel-pedidos-page__eyebrow">Fila ativa de atendimento</p>
+            <h1 className="painel-pedidos-page__title">Painel de Pedidos</h1>
+            <p className="painel-pedidos-page__count">{total} pedido(s) encontrado(s)</p>
+          </div>
 
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-3 bg-gray-900 border border-gray-800 rounded-2xl p-4">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-          <input
-            value={filtros.busca}
-            onChange={e => setFiltros(p => ({ ...p, busca: e.target.value }))}
-            placeholder="Buscar cliente ou nº pedido..."
-            className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
-          />
-        </div>
-        <select
-          value={filtros.status_pedido}
-          onChange={e => setFiltros(p => ({ ...p, status_pedido: e.target.value }))}
-          className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
-        >
-          {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <select
-          value={filtros.tipo_atendimento}
-          onChange={e => setFiltros(p => ({ ...p, tipo_atendimento: e.target.value }))}
-          className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
-        >
-          {TIPO_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-      </div>
+          <div className="painel-pedidos-page__hero-actions">
+            <button onClick={fetchPedidos} className="painel-pedidos-page__refresh">
+              <RefreshCw className="painel-pedidos-page__refresh-icon" />
+              Atualizar
+            </button>
+            <Link to="/pdv" className="painel-pedidos-page__new-order">
+              + Novo Pedido
+            </Link>
+          </div>
+        </header>
 
-      {/* Pedidos */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : pedidos.length === 0 ? (
-        <div className="text-center py-16 text-gray-600">
-          <Clock className="w-16 h-16 mx-auto mb-4" />
-          <p className="text-lg">Nenhum pedido encontrado</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {pedidos.map(pedido => {
-            const minutos = diffMinutes(pedido.criado_em);
-            const atrasado = minutos > 45 && !['FINALIZADO', 'CANCELADO', 'ENTREGUE'].includes(pedido.status_pedido);
-            const aguardPag = pedido.status_pedido === 'AGUARDANDO_PAGAMENTO';
+        <section className="painel-pedidos-page__filters">
+          <div className="painel-pedidos-page__search">
+            <Search className="painel-pedidos-page__search-icon" />
+            <input
+              value={filtros.busca}
+              onChange={(e) => setFiltros((p) => ({ ...p, busca: e.target.value }))}
+              placeholder="Buscar cliente ou n° pedido..."
+              className="painel-pedidos-page__search-input"
+            />
+          </div>
 
-            return (
-              <Link
-                key={pedido.id}
-                to={`/pedidos/${pedido.id}`}
-                className={`flex items-center gap-4 bg-gray-900 hover:bg-gray-800/80 border rounded-2xl p-4 transition-all duration-200 card-hover ${
-                  aguardPag ? 'border-yellow-500/40' : atrasado ? 'border-red-500/40' : 'border-gray-800'
-                }`}
-              >
-                {/* Número + tipo */}
-                <div className="flex-shrink-0 text-center">
-                  <p className="text-2xl">{TIPO_LABELS[pedido.tipo_atendimento]}</p>
-                  <p className="text-white font-bold text-sm">#{pedido.numero}</p>
-                </div>
+          <div className="painel-pedidos-page__selects">
+            <select
+              value={filtros.status_pedido}
+              onChange={(e) => setFiltros((p) => ({ ...p, status_pedido: e.target.value }))}
+              className="painel-pedidos-page__select"
+            >
+              {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <select
+              value={filtros.tipo_atendimento}
+              onChange={(e) => setFiltros((p) => ({ ...p, tipo_atendimento: e.target.value }))}
+              className="painel-pedidos-page__select"
+            >
+              {TIPO_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        </section>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-white font-medium truncate">
-                      {pedido.cliente?.nome || 'Sem nome'}
-                    </p>
-                    {pedido.mesa && <span className="text-gray-500 text-xs">· Mesa {pedido.mesa.numero}</span>}
-                    {atrasado && <span className="text-red-400 text-xs font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Atrasado</span>}
+        {loading ? (
+          <div className="painel-pedidos-page__loading">
+            <div className="painel-pedidos-page__spinner" />
+          </div>
+        ) : pedidos.length === 0 ? (
+          <div className="painel-pedidos-page__empty">
+            <Clock className="painel-pedidos-page__empty-icon" />
+            <p className="painel-pedidos-page__empty-text">Nenhum pedido encontrado</p>
+          </div>
+        ) : (
+          <div className="painel-pedidos-page__list">
+            {pedidos.map((pedido) => {
+              const minutos = diffMinutes(pedido.criado_em);
+              const atrasado = minutos > 45 && !['FINALIZADO', 'CANCELADO', 'ENTREGUE'].includes(pedido.status_pedido);
+              const aguardPag = pedido.status_pedido === 'AGUARDANDO_PAGAMENTO';
+
+              return (
+                <Link
+                  key={pedido.id}
+                  to={`/pedidos/${pedido.id}`}
+                  className={`painel-pedidos-page__item ${aguardPag ? 'painel-pedidos-page__item--payment' : atrasado ? 'painel-pedidos-page__item--late' : ''}`}
+                >
+                  <div className="painel-pedidos-page__item-type">
+                    <p className="painel-pedidos-page__item-emoji">{TIPO_LABELS[pedido.tipo_atendimento]}</p>
+                    <p className="painel-pedidos-page__item-number">#{pedido.numero}</p>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span>{FORMA_LABELS[pedido.forma_pagamento]} {pedido.forma_pagamento?.replace('_', ' ')}</span>
-                    <span>·</span>
-                    <span>{minutos < 60 ? `${minutos}min atrás` : `${Math.floor(minutos/60)}h atrás`}</span>
-                    <span>·</span>
-                    <span>{pedido.itens?.length} item(s)</span>
+
+                  <div className="painel-pedidos-page__item-main">
+                    <div className="painel-pedidos-page__item-head">
+                      <p className="painel-pedidos-page__item-customer">{pedido.cliente?.nome || 'Sem nome'}</p>
+                      {pedido.mesa && <span className="painel-pedidos-page__item-meta">· Mesa {pedido.mesa.numero}</span>}
+                      {atrasado && (
+                        <span className="painel-pedidos-page__item-alert">
+                          <AlertCircle className="painel-pedidos-page__item-alert-icon" />
+                          Atrasado
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="painel-pedidos-page__item-info">
+                      <span>{FORMA_LABELS[pedido.forma_pagamento]} {pedido.forma_pagamento?.replace('_', ' ')}</span>
+                      <span>·</span>
+                      <span>{minutos < 60 ? `${minutos}min atrás` : `${Math.floor(minutos / 60)}h atrás`}</span>
+                      <span>·</span>
+                      <span>{pedido.itens?.length} item(s)</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Status + valor */}
-                <div className="flex-shrink-0 text-right">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border mb-1 ${STATUS_COLORS[pedido.status_pedido]}`}>
-                    {STATUS_LABELS[pedido.status_pedido]}
-                  </span>
-                  <p className="text-orange-400 font-bold">R$ {parseFloat(pedido.valor_total).toFixed(2)}</p>
-                </div>
+                  <div className="painel-pedidos-page__item-side">
+                    <span className={`painel-pedidos-page__status ${STATUS_COLORS[pedido.status_pedido]}`}>
+                      {STATUS_LABELS[pedido.status_pedido]}
+                    </span>
+                    <p className="painel-pedidos-page__item-total">R$ {parseFloat(pedido.valor_total).toFixed(2)}</p>
+                  </div>
 
-                <Eye className="w-4 h-4 text-gray-600 flex-shrink-0" />
-              </Link>
-            );
-          })}
-        </div>
-      )}
+                  <Eye className="painel-pedidos-page__item-view" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

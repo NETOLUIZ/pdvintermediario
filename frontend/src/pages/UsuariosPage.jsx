@@ -2,25 +2,32 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Shield, ToggleRight, ToggleLeft, X } from 'lucide-react';
+import { Plus, Pencil, Shield, ToggleRight, ToggleLeft, X, Users, LockKeyhole, BadgeCheck } from 'lucide-react';
+import './UsuariosPage.css';
 
 const PERFIS = [
-  { value: 'ADMIN', label: 'Administrador', color: 'text-red-400 bg-red-500/10', desc: 'Acesso total, pode confirmar pagamentos' },
-  { value: 'ATENDENTE', label: 'Atendente', color: 'text-blue-400 bg-blue-500/10', desc: 'Pode criar e gerenciar pedidos' },
-  { value: 'OPERADOR_CAIXA', label: 'Op. Caixa', color: 'text-green-400 bg-green-500/10', desc: 'Acesso ao módulo de caixa' },
+  { value: 'ADMIN', label: 'Administrador', desc: 'Acesso total, pode confirmar pagamentos', tone: 'danger' },
+  { value: 'ATENDENTE', label: 'Atendente', desc: 'Pode criar e gerenciar pedidos', tone: 'info' },
+  { value: 'OPERADOR_CAIXA', label: 'Op. Caixa', desc: 'Acesso ao módulo de caixa', tone: 'success' },
 ];
 
 function Modal({ open, onClose, children, title }) {
   if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md shadow-2xl animate-fade-in">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-          <h3 className="text-white font-semibold">{title}</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white"><X className="w-5 h-5" /></button>
+    <div className="usuarios-modal" role="dialog" aria-modal="true">
+      <div className="usuarios-modal__backdrop" onClick={onClose} />
+      <div className="usuarios-modal__panel">
+        <div className="usuarios-modal__header">
+          <div>
+            <p className="usuarios-modal__eyebrow">Administração</p>
+            <h3 className="usuarios-modal__title">{title}</h3>
+          </div>
+          <button onClick={onClose} className="usuarios-modal__close" type="button" aria-label="Fechar modal">
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="usuarios-modal__body">{children}</div>
       </div>
     </div>
   );
@@ -38,14 +45,26 @@ export default function UsuariosPage() {
     setUsuarios(res.data);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => {
+    fetch();
+  }, []);
 
-  const abrirNovo = () => { setEditando(null); setForm({ nome: '', email: '', senha: '', perfil: 'ATENDENTE' }); setModal(true); };
-  const abrirEditar = (u) => { setEditando(u); setForm({ nome: u.nome, email: u.email, senha: '', perfil: u.perfil }); setModal(true); };
+  const abrirNovo = () => {
+    setEditando(null);
+    setForm({ nome: '', email: '', senha: '', perfil: 'ATENDENTE' });
+    setModal(true);
+  };
+
+  const abrirEditar = (usuario) => {
+    setEditando(usuario);
+    setForm({ nome: usuario.nome, email: usuario.email, senha: '', perfil: usuario.perfil });
+    setModal(true);
+  };
 
   const handleSalvar = async () => {
     if (!form.nome || !form.email) return toast.error('Nome e email são obrigatórios');
     if (!editando && !form.senha) return toast.error('Senha é obrigatória');
+
     try {
       if (editando) {
         await api.put(`/usuarios/${editando.id}`, form);
@@ -56,135 +75,206 @@ export default function UsuariosPage() {
       }
       setModal(false);
       fetch();
-    } catch (err) { toast.error(err.response?.data?.error || 'Erro ao salvar'); }
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Erro ao salvar');
+    }
   };
 
-  const handleToggle = async (u) => {
-    if (u.id === eu.id) return toast.error('Você não pode desativar seu próprio usuário');
+  const handleToggle = async (usuario) => {
+    if (usuario.id === eu.id) return toast.error('Você não pode desativar seu próprio usuário');
+
     try {
-      await api.delete(`/usuarios/${u.id}`);
-      toast(u.ativo ? 'Usuário desativado' : 'Ação não permitida', { icon: '⚠️' });
+      await api.delete(`/usuarios/${usuario.id}`);
+      toast(usuario.ativo ? 'Usuário desativado' : 'Ação não permitida', { icon: '⚠️' });
       fetch();
-    } catch { toast.error('Erro'); }
+    } catch {
+      toast.error('Erro');
+    }
   };
+
+  const usuariosAtivos = usuarios.filter((usuario) => usuario.ativo).length;
+  const administradores = usuarios.filter((usuario) => usuario.perfil === 'ADMIN').length;
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="usuarios-page animate-fade-in">
+      <section className="usuarios-page__hero">
         <div>
-          <h1 className="text-2xl font-bold text-white">Usuários</h1>
-          <p className="text-gray-400 text-sm">{usuarios.length} usuário(s) cadastrado(s)</p>
+          <p className="usuarios-page__eyebrow">Controle de acesso</p>
+          <h1 className="usuarios-page__title">Usuários, perfis e permissões operacionais</h1>
+          <p className="usuarios-page__subtitle">
+            Administração visualmente alinhada ao resto do sistema, sem mudar a estrutura da tabela, modal e ações.
+          </p>
         </div>
-        <button onClick={abrirNovo}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all">
-          <Plus className="w-4 h-4" /> Novo Usuário
+
+        <button type="button" onClick={abrirNovo} className="usuarios-page__primary-button">
+          <Plus className="w-4 h-4" />
+          Novo Usuário
         </button>
-      </div>
+      </section>
 
-      {/* Tabela */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-800">
-              {['Usuário', 'Email', 'Perfil', 'Status', 'Ações'].map(h => (
-                <th key={h} className="text-left px-5 py-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.map((u) => {
-              const perfil = PERFIS.find(p => p.value === u.perfil);
-              return (
-                <tr key={u.id} className="border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-orange-500/20 flex items-center justify-center">
-                        <span className="text-orange-400 font-bold">{u.nome.charAt(0).toUpperCase()}</span>
-                      </div>
-                      <span className="text-white font-medium">{u.nome}</span>
-                      {u.id === eu.id && <span className="text-orange-400 text-xs">(você)</span>}
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 text-gray-400 text-sm">{u.email}</td>
-                  <td className="px-5 py-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${perfil?.color}`}>
-                      <Shield className="w-3 h-3" /> {perfil?.label}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className={`text-xs font-semibold ${u.ativo ? 'text-green-400' : 'text-red-400'}`}>
-                      {u.ativo ? '● Ativo' : '○ Inativo'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex gap-2">
-                      <button onClick={() => abrirEditar(u)}
-                        className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      {u.id !== eu.id && (
-                        <button onClick={() => handleToggle(u)}
-                          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
-                          {u.ativo ? <ToggleRight className="w-4 h-4 text-green-400" /> : <ToggleLeft className="w-4 h-4" />}
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Perfis info */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {PERFIS.map(p => (
-          <div key={p.value} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <div className={`flex items-center gap-2 mb-2 ${p.color} text-sm font-semibold`}>
-              <Shield className="w-4 h-4" /> {p.label}
-            </div>
-            <p className="text-gray-500 text-xs">{p.desc}</p>
+      <section className="usuarios-page__stats">
+        <article className="usuarios-page__stat-card">
+          <div className="usuarios-page__stat-icon">
+            <Users className="w-5 h-5" />
           </div>
+          <div>
+            <p className="usuarios-page__stat-label">Usuários cadastrados</p>
+            <strong className="usuarios-page__stat-value">{usuarios.length}</strong>
+          </div>
+        </article>
+
+        <article className="usuarios-page__stat-card">
+          <div className="usuarios-page__stat-icon">
+            <BadgeCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="usuarios-page__stat-label">Usuários ativos</p>
+            <strong className="usuarios-page__stat-value">{usuariosAtivos}</strong>
+          </div>
+        </article>
+
+        <article className="usuarios-page__stat-card">
+          <div className="usuarios-page__stat-icon">
+            <LockKeyhole className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="usuarios-page__stat-label">Administradores</p>
+            <strong className="usuarios-page__stat-value">{administradores}</strong>
+          </div>
+        </article>
+      </section>
+
+      <section className="usuarios-page__table-shell">
+        <div className="usuarios-page__table-header">
+          <div>
+            <p className="usuarios-page__table-eyebrow">Painel administrativo</p>
+            <h2 className="usuarios-page__table-title">Lista de usuários</h2>
+          </div>
+        </div>
+
+        <div className="usuarios-page__table-scroll">
+          <table className="usuarios-page__table">
+            <thead>
+              <tr>
+                {['Usuário', 'Email', 'Perfil', 'Status', 'Ações'].map((header) => (
+                  <th key={header}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {usuarios.map((usuario) => {
+                const perfil = PERFIS.find((item) => item.value === usuario.perfil);
+                return (
+                  <tr key={usuario.id}>
+                    <td>
+                      <div className="usuarios-page__user-cell">
+                        <div className="usuarios-page__avatar">
+                          <span>{usuario.nome.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div>
+                          <strong>{usuario.nome}</strong>
+                          {usuario.id === eu.id && <span className="usuarios-page__self-tag">você</span>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="usuarios-page__muted">{usuario.email}</td>
+                    <td>
+                      <span className={`usuarios-page__role-badge tone-${perfil?.tone}`}>
+                        <Shield className="w-3.5 h-3.5" />
+                        {perfil?.label}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`usuarios-page__status ${usuario.ativo ? 'is-active' : 'is-inactive'}`}>
+                        {usuario.ativo ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="usuarios-page__actions">
+                        <button type="button" onClick={() => abrirEditar(usuario)} className="usuarios-page__icon-button">
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        {usuario.id !== eu.id && (
+                          <button type="button" onClick={() => handleToggle(usuario)} className="usuarios-page__icon-button">
+                            {usuario.ativo ? (
+                              <ToggleRight className="w-5 h-5 text-emerald-400" />
+                            ) : (
+                              <ToggleLeft className="w-5 h-5 text-slate-500" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="usuarios-page__profiles">
+        {PERFIS.map((perfil) => (
+          <article key={perfil.value} className={`usuarios-page__profile-card tone-${perfil.tone}`}>
+            <div className="usuarios-page__profile-icon">
+              <Shield className="w-4 h-4" />
+            </div>
+            <div>
+              <h3>{perfil.label}</h3>
+              <p>{perfil.desc}</p>
+            </div>
+          </article>
         ))}
-      </div>
+      </section>
 
       <Modal open={modal} onClose={() => setModal(false)} title={editando ? 'Editar Usuário' : 'Novo Usuário'}>
-        <div className="space-y-4">
-          <div>
-            <label className="text-gray-400 text-xs block mb-1.5">Nome *</label>
-            <input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500" />
+        <div className="usuarios-form">
+          <div className="usuarios-form__field">
+            <label>Nome *</label>
+            <input value={form.nome} onChange={(e) => setForm((prev) => ({ ...prev, nome: e.target.value }))} />
           </div>
-          <div>
-            <label className="text-gray-400 text-xs block mb-1.5">Email *</label>
-            <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500" />
+
+          <div className="usuarios-form__field">
+            <label>Email *</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+            />
           </div>
-          <div>
-            <label className="text-gray-400 text-xs block mb-1.5">{editando ? 'Nova senha (deixe em branco para manter)' : 'Senha *'}</label>
-            <input type="password" value={form.senha} onChange={e => setForm(p => ({ ...p, senha: e.target.value }))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500" />
+
+          <div className="usuarios-form__field">
+            <label>{editando ? 'Nova senha (deixe em branco para manter)' : 'Senha *'}</label>
+            <input
+              type="password"
+              value={form.senha}
+              onChange={(e) => setForm((prev) => ({ ...prev, senha: e.target.value }))}
+            />
           </div>
-          <div>
-            <label className="text-gray-400 text-xs block mb-2">Perfil</label>
-            <div className="space-y-2">
-              {PERFIS.map(p => (
-                <button key={p.value} onClick={() => setForm(prev => ({ ...prev, perfil: p.value }))}
-                  className={`w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left ${
-                    form.perfil === p.value ? 'border-orange-500 bg-orange-500/10' : 'border-gray-700 hover:border-gray-600'
-                  }`}>
-                  <div className={`mt-0.5 p-1 rounded-lg ${p.color}`}><Shield className="w-3.5 h-3.5" /></div>
+
+          <div className="usuarios-form__profiles">
+            <label>Perfil</label>
+            <div className="usuarios-form__profiles-list">
+              {PERFIS.map((perfil) => (
+                <button
+                  key={perfil.value}
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, perfil: perfil.value }))}
+                  className={`usuarios-form__profile-option ${form.perfil === perfil.value ? 'is-active' : ''}`}
+                >
+                  <div className={`usuarios-form__profile-badge tone-${perfil.tone}`}>
+                    <Shield className="w-3.5 h-3.5" />
+                  </div>
                   <div>
-                    <p className={`text-sm font-medium ${form.perfil === p.value ? 'text-white' : 'text-gray-300'}`}>{p.label}</p>
-                    <p className="text-gray-500 text-xs">{p.desc}</p>
+                    <strong>{perfil.label}</strong>
+                    <p>{perfil.desc}</p>
                   </div>
                 </button>
               ))}
             </div>
           </div>
-          <button onClick={handleSalvar}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition-all">
+
+          <button type="button" onClick={handleSalvar} className="usuarios-form__submit">
             {editando ? 'Atualizar Usuário' : 'Criar Usuário'}
           </button>
         </div>

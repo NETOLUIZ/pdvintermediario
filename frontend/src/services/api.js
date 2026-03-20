@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_PDV_API_URL || 'http://127.0.0.1:3001/api/v1',
+  baseURL: import.meta.env.VITE_PDV_API_URL || 'http://127.0.0.1:3001/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -28,51 +28,72 @@ api.interceptors.response.use(
 );
 
 export const pdvAuthApi = {
-  async login(login, senha) {
-    const response = await api.post('/pdv/auth/login', { login, senha });
-    return response.data?.data ?? response.data;
+  async login(email, senha) {
+    const response = await api.post('/auth/login', { email, senha });
+    const data = response.data?.data ?? response.data;
+
+    return {
+      token: data.token,
+      user: data.usuario,
+      store: data.store ?? null,
+      raw: data,
+    };
+  },
+
+  async me() {
+    const response = await api.get('/auth/me');
+    return response.data?.usuario ?? response.data?.data?.usuario ?? null;
   },
 };
 
 export const pdvCoreApi = {
   async bootstrap() {
-    const response = await api.get('/pdv/bootstrap');
-    return response.data?.data ?? response.data;
+    const [categorias, mesas] = await Promise.all([
+      api.get('/categorias'),
+      api.get('/mesas'),
+    ]);
+
+    return {
+      categories: categorias.data ?? [],
+      tables: mesas.data ?? [],
+    };
   },
 
   async products() {
-    const response = await api.get('/pdv/products');
-    return response.data?.data?.products ?? [];
+    const response = await api.get('/produtos');
+    return response.data ?? [];
   },
 
   async customers(search = '') {
-    const response = await api.get('/pdv/customers', { params: { search } });
-    return response.data?.data?.customers ?? [];
+    const response = await api.get('/clientes', { params: search ? { busca: search } : {} });
+    return response.data ?? [];
   },
 
   async createCustomer(payload) {
-    const response = await api.post('/pdv/customers', payload);
-    return response.data?.data?.customer ?? null;
+    const response = await api.post('/clientes', payload);
+    return response.data ?? null;
   },
 
   async orders(status = null) {
-    const response = await api.get('/pdv/orders', { params: { status } });
-    return response.data?.data?.orders ?? [];
+    const response = await api.get('/pedidos', {
+      params: status ? { status_pedido: status } : {},
+    });
+    return response.data?.pedidos ?? [];
   },
 
   async orderById(id) {
-    const response = await api.get(`/pdv/orders/${id}`);
-    return response.data?.data?.order ?? null;
+    const response = await api.get(`/pedidos/${id}`);
+    return response.data ?? null;
   },
 
   async createOrder(payload) {
-    const response = await api.post('/pdv/orders', payload);
-    return response.data?.data?.order ?? null;
+    const response = await api.post('/pedidos', payload);
+    return response.data ?? null;
   },
 
   async updateOrderStatus(id, status) {
-    const response = await api.patch(`/pdv/orders/${id}/status`, { status });
-    return response.data?.data?.order ?? null;
+    const response = await api.put(`/pedidos/${id}/status`, { status });
+    return response.data ?? null;
   },
 };
 
